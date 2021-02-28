@@ -1,0 +1,38 @@
+---
+- name: Gather swarm info (find the manager)
+  block:
+    - docker_host_info:
+      register: docker_info
+    - set_fact:
+        swarm_manager: "{{ docker_info.host_info.Swarm.RemoteManagers[0].Addr.split(':')[0]}}"
+  when: inventory_hostname in groups["managers"]
+  run_once: true
+
+- name: Load compose files
+  set_fact:
+    compose_ymls: {}
+
+- name: Aggregate compose files list
+  set_fact:
+    compose_ymls: "{{compose_ymls | combine({item: lookup('file', item) | from_yaml})}}"
+  with_fileglob:
+    - "{{stack_name | mandatory}}/*compose.yaml"
+    - "{{stack_name | mandatory}}/*compose.yml"
+  run_once: true
+
+- name: List compose files for deployment
+  debug:
+    msg: "{{compose_ymls.keys() | sort | to_nice_yaml}}"
+  run_once: true
+
+- name: Deploy docker stack
+  become: yes
+  become_user: ubuntu
+  docker_stack:
+    state: present
+    prune: true
+    resolve_image: always
+    name: "{{stack_name | mandatory}}"
+    compose: "{{compose_ymls.values() | list}}"
+  when: inventory_hostname in groups["managers"]
+  run_once: true

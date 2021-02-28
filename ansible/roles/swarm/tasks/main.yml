@@ -1,0 +1,45 @@
+---
+- name: Initalize Swarm cluster
+  block:
+    - docker_swarm:
+        state: present
+        force: no
+      register: swarm_info
+    - set_fact:
+        manager_hostname: "{{hostvars[inventory_hostname].ansible_host}}"
+  when: inventory_hostname in groups['managers']
+  run_once: true
+
+- name: Add workers to the Swarm cluster
+  docker_swarm:
+    state: join
+    join_token: "{{swarm_info.swarm_facts.JoinTokens.Worker}}"
+    advertise_addr: "eth*"
+    remote_addrs: [ "{{manager_hostname}}:2377" ]
+  when: inventory_hostname in groups['workers']
+
+#- name: Enable Docker experimental
+#  copy:
+#    dest: "/etc/docker/daemon.json"
+#    content: |
+#      {
+#          "experimental": true,
+#          "metrics-addr": "172.18.0.1:9323"
+#      }
+#  register: experimental
+#
+#- name: Restart docker daemon
+#  systemd:
+#    name: docker
+#    state: restarted
+#    daemon_reload: yes
+#  when: experimental.changed
+#
+#- name: Ensure Docker daemon is running
+#  service:
+#    name: docker
+#    state: started
+#  register: docker_service
+#  until: docker_service.status.ActiveState == "active"
+#  retries: 15
+#  delay: 20

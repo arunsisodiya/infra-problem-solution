@@ -1,0 +1,50 @@
+---
+- name: Add Docker repo GPG key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+
+- name: Add Docker repo
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ubuntu_distr}} stable
+
+- name: Install list of packages
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+      - docker-ce
+      - python-pip
+      - python3-pip
+      - jq
+    update_cache: yes
+
+- name: Check Docker version
+  shell: "docker -v | cut -d ' ' -f 3 | cut -d ',' -f 1"
+  register: version
+
+- debug: var=version.stdout
+
+- name: Install list of python packages
+  pip:
+    name:
+      - docker
+      - jsondiff
+      - pyyaml
+    state: latest
+    extra_args: --upgrade
+
+- name: Disable unattended upgrades
+  become: yes
+  become_user: root
+  replace:
+    path: "/etc/apt/apt.conf.d/20auto-upgrades"
+    regexp: "1"
+    replace: "0"
+
+- name: Add ec2 user to docker group
+  user:
+    name: "{{hostvars[inventory_hostname].ansible_user}}"
+    groups: [docker]
+    append: yes

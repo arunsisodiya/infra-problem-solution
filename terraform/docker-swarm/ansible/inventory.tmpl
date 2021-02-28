@@ -1,0 +1,17 @@
+[managers]
+%{ for index, dns in manager-private-dns ~}
+${dns} ansible_host=${manager-private-ip[index]} # ${manager-private-id[index]}
+%{ endfor ~}
+
+[workers]
+%{ for index, dns in worker-private-dns ~}
+${dns} ansible_host=${worker-private-ip[index]} # ${worker-private-id[index]}
+%{ endfor ~}
+
+[managers:vars]
+ansible_user = ${managers_ami_username}
+ansible_ssh_common_args = '-o "ProxyCommand ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/Downloads/infra-dev.pem -W %h:%p ${managers_ami_username}@${bastion_instance_ip}"'
+
+[workers:vars]
+ansible_user = ${workers_ami_username}
+ansible_ssh_common_args = '-o "ProxyCommand ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/Downloads/infra-dev.pem -W %h:%p ${workers_ami_username}@${bastion_instance_ip}"'
