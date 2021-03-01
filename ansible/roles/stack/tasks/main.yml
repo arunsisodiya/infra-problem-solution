@@ -20,6 +20,22 @@
     - "{{stack_name | mandatory}}/*compose.yml"
   run_once: true
 
+- name: Create Docker secret for News Feed
+  docker_secret:
+    name: newsfeed_service_token
+    data: VDEmZVdiWVhOV0cxdzFeWUdLRFB4QVdKQF5ldF4ma1g=
+    data_is_b64: true
+  when: inventory_hostname in groups["managers"]
+
+- name: Create config for nginx
+  docker_config:
+    name: nginx_config
+    data: "{{lookup('file', '{{stack_name | mandatory}}/nginx.conf') | b64encode}}"
+    data_is_b64: true
+    state: present
+    force: yes
+  when: inventory_hostname in groups["managers"]
+
 - name: List compose files for deployment
   debug:
     msg: "{{compose_ymls.keys() | sort | to_nice_yaml}}"

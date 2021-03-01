@@ -1,47 +1,57 @@
 version: "3.9"
 
 services:
-  front-end:
-    image: "arunsingh1801/front-end:v1"
+  nginx:
+    image: nginx:1.18.0-alpine
     deploy:
       mode: global
       restart_policy:
         condition: on-failure
+    configs:
+      - source: nginx_config
+        target: /etc/nginx/nginx.conf
+        mode: 0755
     networks:
       - infra-network
-#    healthcheck:
-#      test: curl -sS http://quotes:8081/ping || exit 1
-#      interval: 5s
-#      timeout: 10s
-#      retries: 3
     ports:
       - target: 8080
         published: 8080
         protocol: tcp
         mode: host
     depends_on:
-      - quotes
-      - newsfeed
-    environment:
-      - APP_PORT=8080
-      - STATIC_URL=http://0.0.0.0:8000
-      - QUOTE_SERVICE_URL=http://quotes:8081
-      - NEWSFEED_SERVICE_URL=http://newsfeed:8082
-      - NEWSFEED_SERVICE_TOKEN=T1&eWbYXNWG1w1^YGKDPxAWJ@^et^&kX
+      - front-end
 
-  quotes:
-    image: "arunsingh1801/quotes:v1"
+  front-end:
+    image: "arunsingh1801/front-end:v2"
     deploy:
       replicas: 1
       restart_policy:
         condition: on-failure
     networks:
       - infra-network
+    depends_on:
+      - quotes
+      - newsfeed
+      - static
     environment:
-      - APP_PORT=8081
+      APP_PORT: 8081
+      STATIC_URL: http://static:8000
+      QUOTE_SERVICE_URL: http://quotes:8082
+      NEWSFEED_SERVICE_URL: http://newsfeed:8083
+    secrets:
+      - newsfeed_service_token
 
-  newsfeed:
-    image: "arunsingh1801/newsfeed:v1"
+  static:
+    image: "arunsingh1801/static:v2"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - infra-network
+
+  quotes:
+    image: "arunsingh1801/quotes:v2"
     deploy:
       replicas: 1
       restart_policy:
@@ -50,3 +60,18 @@ services:
       - infra-network
     environment:
       - APP_PORT=8082
+    secrets:
+      - newsfeed_service_token
+
+  newsfeed:
+    image: "arunsingh1801/newsfeed:v2"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - infra-network
+    environment:
+      - APP_PORT=8083
+    secrets:
+      - newsfeed_service_token

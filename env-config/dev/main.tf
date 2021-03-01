@@ -184,7 +184,7 @@ locals {
 
 module "vpc" {
 
-  source           = "../Iac/vpc"
+  source           = "../../terraform/vpc"
   name             = "infra-dev-vpc"
   environment      = var.environment
   cidr             = "10.0.0.0/16"
@@ -195,7 +195,7 @@ module "vpc" {
   azs             = ["eu-west-1a", "eu-west-1b"]
 
   bastion_host               = true
-  bastion_key_name           = "infra-dev"
+  bastion_key_name           = var.key_pair
   os                         = "ubuntu-16.04"
   private_nat_gateway        = true
   private_network_acl        = true
@@ -224,7 +224,7 @@ module "vpc" {
 }
 
 module "docker-swarm" {
-  source = "../Iac/docker-swarm"
+  source = "../../terraform/docker-swarm"
 
   vpc_id                     = module.vpc.vpc_id
   environment                = var.environment
@@ -240,7 +240,7 @@ module "docker-swarm" {
       os            = "ubuntu-16.04"
       instance_type = "t2.micro"
       ami_username  = "ubuntu"
-      key_name      = "infra-dev"
+      key_name      = var.key_pair
       role          = "manager"
       tags = {
         "role"        = "manager"
@@ -252,7 +252,7 @@ module "docker-swarm" {
       os            = "ubuntu-16.04"
       instance_type = "t2.micro"
       ami_username  = "ubuntu"
-      key_name      = "infra-dev"
+      key_name      = var.key_pair
       role          = "worker"
       tags = {
         "role"        = "worker"

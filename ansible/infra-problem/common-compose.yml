@@ -6,3 +6,13 @@ networks:
     ipam:
       config:
         - subnet: 10.0.1.0/24
+
+secrets:
+  newsfeed_service_token:
+    external: true
+    name: newsfeed_service_token
+
+configs:
+  nginx_config:
+    external: true
+    name: nginx_config
