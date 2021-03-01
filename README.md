@@ -91,6 +91,10 @@ Before building the infrastructure, there is one dependency related to defining 
 
 For example, In `env-config/dev/terraform.tfvars`, update the value of `key_pair` with the key that you have generated.
 
+```ini
+key_pair = "infra-dev"
+```
+
 ### Variables
 
 - `ENV` - Define the environment for which infrastructure need to be build
