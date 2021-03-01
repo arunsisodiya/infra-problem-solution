@@ -27,8 +27,10 @@ To have a common development environment for all the users of this solution, fol
 - `terraform` - to bootstrap the infrastructure - [Download](https://www.terraform.io/)
 - `Docker` - to containerize applications and push to docker hub - [Download](https://docs.docker.com/get-docker/)
 - `Ansible`- to perform configuration management tasks - [Download](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+- `pip` - to install dependencies and tools such as Ansible - [Download](https://pip.pypa.io/en/stable/installing/)
+- `python > 3.6` - to run packages related to pip. - [Download](https://www.python.org/downloads/)
 
-> Note- We are going to use **Docker swarm** as orchestration tool. There are many other orchestration tools are available such as Kubernetes but for small applications we prefer to use Docker Swarm due to its less complex behavior in bootstrapping.
+> Note- We are going to use **Docker swarm** as orchestration tool. There are many other orchestration tools available such as Kubernetes but for small applications we prefer to use Docker Swarm due to its simpler bootstrapping.
 
 ## Cloud provider configuration
 
@@ -36,7 +38,7 @@ Additional to the tools, we need some other configuration as well in form of set
 
 - Cloud provider used - [Amazon Web Services](https://aws.amazon.com/)
 
-Before using the solution, we must have an AWS account and `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` of a user with `arn:aws:iam::aws:policy/PowerUserAccess` policy. This policy provides full access to AWS services and resources, but does not allow management of Users and groups.
+Before using the solution, we must have an AWS account with `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` of a user with `arn:aws:iam::aws:policy/PowerUserAccess` policy. This policy provides full access to AWS services and resources, but does not allow management of Users and groups.
 
 To create a user with PowerUserAccess policy, follow this tutorial - <https://docs.aws.amazon.com/IAM/latest/UserGuide/getting-started_create-delegated-user.html>
 

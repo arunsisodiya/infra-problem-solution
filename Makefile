@@ -18,7 +18,7 @@ app.push:
 	tar -zxvf $(APPS_DIR)/$(BUILD_DIR)/$(STATIC_ARCHIVE).tgz
 	aws s3 cp css/ s3://$(S3_BUCKET_NAME)/css --recursive
 
-build_infra:
+build.infra:
 	@cd env-config/$(ENV) && terraform init && terraform plan -out=$(ENV)-output && terraform apply --auto-approve "$(ENV)-output"
 
 destory.infra:
