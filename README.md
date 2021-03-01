@@ -2,6 +2,23 @@
 
 This document helps to build an infrastructure using Iac(Infrastructure as code) deploy a micro-services based application in Cloud infrastructure.
 
+- [ThoughtWorks - Infra Problem Solution](#thoughtworks---infra-problem-solution)
+  - [Prerequisites](#prerequisites)
+  - [Cloud provider configuration](#cloud-provider-configuration)
+  - [Architecture Overview](#architecture-overview)
+  - [Project Structure](#project-structure)
+  - [Building Infrastructure using Iac](#building-infrastructure-using-iac)
+    - [Dependencies](#dependencies)
+    - [Variables](#variables)
+    - [Commands](#commands)
+  - [Containerize the application and Push to docker hub](#containerize-the-application-and-push-to-docker-hub)
+    - [Variables](#variables-1)
+    - [Commands](#commands-1)
+  - [Configure Swarm cluster and deploy application](#configure-swarm-cluster-and-deploy-application)
+    - [Dependencies](#dependencies-1)
+    - [Commands](#commands-2)
+  - [Accessing the application via Load balancer](#accessing-the-application-via-load-balancer)
+
 ## Prerequisites
 
 To have a common development environment for all the users of this solution, following tools are expected on your computer:
