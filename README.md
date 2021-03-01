@@ -13,8 +13,6 @@ To have a common development environment for all the users of this solution, fol
 
 > Note- We are going to use **Docker swarm** as orchestration tool. There are many other orchestration tools are available such as Kubernetes but for small applications we prefer to use Docker Swarm due to its less complex behavior in bootstrapping.
 
----
-
 ## Cloud provider configuration
 
 Additional to the tools, we need some other configuration as well in form of setting environment variables for using cloud providers.
@@ -33,8 +31,6 @@ export AWS_SECRET_ACCESS_KEY=<ACCESS_SECRET>
 ```
 
 _Note - There are different other mechanisms to inject **AWS_ACCESS_KEY_ID** and **AWS_SECRET_ACCESS_KEY** but I am currently using the environment variables._
-
----
 
 ## Project Structure
 
@@ -87,8 +83,6 @@ Before building the infrastructure and running the application in cloud, lets un
 - `env-config` - This directory contains the environment configuration. To add a new environment, we can create a new folder named as environment and create configuration variables in `main.tf`.
 - `terraform` - This directory contains terraform modules which can be imported and based on the variables injected to module, infrastructure can be spin up. Similar to ansible roles, if we want to add a new module for our infrastructure, we can create them under terraform directory and import for specific environment.
 
----
-
 ## Building Infrastructure using Iac
 
 ### Dependencies
@@ -112,8 +106,6 @@ make build.infra ENV=<folder_name>
 e.g. If we want to build the infrastructure for dev, then run `make build.infra ENV=dev`
 
 If you don't pass any value to env variable then by default script will take `dev` as value for environment.
-
----
 
 ## Containerize the application and Push to docker hub
 
@@ -143,8 +135,6 @@ make docker.push DOCKER_HUB_USER=<repo_name> IMAGE_TAG=<image_tag>
 
 e.g. make docker.push DOCKER_HUB_USER=arunsingh1801 IMAGE_TAG=v1
 ```
-
----
 
 ## Configure Swarm cluster and deploy application
 
@@ -266,4 +256,4 @@ vpc_id = "vpc-0bc6f1a702f231bf1"
 
 ```
 
-Copy the `elb_dns_name` and access the application.
+Copy the `elb_dns_name` and access the application. If your url is not working, please wait for few minutes since ELB will wait until at least one of the instance is healthy.
