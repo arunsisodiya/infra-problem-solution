@@ -4,9 +4,11 @@ This document helps to build an infrastructure using Iac(Infrastructure as code)
 
 - [ThoughtWorks - Infra Problem Solution](#thoughtworks---infra-problem-solution)
   - [Prerequisites](#prerequisites)
+      - [Tools Compatibility Matrix](#tools-compatibility-matrix)
   - [Cloud provider configuration](#cloud-provider-configuration)
   - [Architecture Overview](#architecture-overview)
   - [Project Structure](#project-structure)
+  - [Static Files configuration](#static-files-configuration)
   - [Building Infrastructure using Iac](#building-infrastructure-using-iac)
     - [Dependencies](#dependencies)
     - [Variables](#variables)
@@ -18,17 +20,25 @@ This document helps to build an infrastructure using Iac(Infrastructure as code)
     - [Dependencies](#dependencies-1)
     - [Commands](#commands-2)
   - [Accessing the application via Load balancer](#accessing-the-application-via-load-balancer)
+  - [TODO](#todo)
+  - [Future work](#future-work)
 
 ## Prerequisites
 
 To have a common development environment for all the users of this solution, following tools are expected on your computer:
 
-- `Make` - to run make command - [Download](https://www.gnu.org/software/make/)
-- `terraform` - to bootstrap the infrastructure - [Download](https://www.terraform.io/)
-- `Docker` - to containerize applications and push to docker hub - [Download](https://docs.docker.com/get-docker/)
-- `Ansible`- to perform configuration management tasks - [Download](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
-- `pip` - to install dependencies and tools such as Ansible - [Download](https://pip.pypa.io/en/stable/installing/)
-- `python > 3.6` - to run packages related to pip. - [Download](https://www.python.org/downloads/)
+#### Tools Compatibility Matrix
+
+| Tool      | Version | Purpose                                                            | Download                                                                                   |
+| --------- | ------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| Make      | 3.81    | Running make targets                                               | [Link](https://www.gnu.org/software/make/)                                                 |
+| AWS CLI   | 2.1.28  | Run operations related to AWS resources such as pushing data to S3 | [Link](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)             |
+| Terraform | > 0.12  | Bootstrapping the infrastructure (Iac)                             | [Link](https://www.terraform.io/)                                                          |
+| Docker    | 20.10.2 | Containerize the application and Push to docker hub                | [Link](https://docs.docker.com/get-docker/)                                                |
+| Ansible   | 2.10.6  | Performing configuration management tasks                          | [Link](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) |
+| Python3   | > 3.6   | Running packages related to pip                                    | [Link](https://www.python.org/downloads/)                                                  |
+| Pip       | 21.0.1  | Installing dependencies and tools such as Ansible                  | [Link](https://pip.pypa.io/en/stable/installing/)                                          |
+| Leiningen | 2.9.5   | Running Clojure applications                                       | [Link](http://leiningen.org/)                                                              |
 
 > Note- We are going to use **Docker swarm** as orchestration tool. There are many other orchestration tools available such as Kubernetes but for small applications we prefer to use Docker Swarm due to its simpler bootstrapping.
 
@@ -121,6 +131,12 @@ Before building the infrastructure and running the application in cloud, lets un
 - `env-config` - This directory contains the environment configuration. To add a new environment, we can create a new folder named as environment and create configuration variables in `main.tf`.
 - `terraform` - This directory contains terraform modules which can be imported and based on the variables injected to module, infrastructure can be spin up. Similar to ansible roles, if we want to add a new module for our infrastructure, we can create them under terraform directory and import for specific environment.
 
+## Static Files configuration
+
+We are using AWS S3 bucket to serve static files. Infrastructure bootstrapping will take care of creating AWS S3 buckets and assigning policies to it.
+
+During building and pushing the application to docker hub, we will push the static content to S3 bucket using aws cli.
+
 ## Building Infrastructure using Iac
 
 ### Dependencies
@@ -142,10 +158,14 @@ key_pair = "infra-dev"
 To build the infrastructure for specific environment, we need to pass the folder name of environment in command line and run following command from the root directory of the project -
 
 ```bash
-make build.infra ENV=<folder_name>
+make build.infra ENV=<env_folder_name>
 ```
 
-e.g. If we want to build the infrastructure for dev, then run `make build.infra ENV=dev`
+If we want to build the infrastructure for dev, run following command
+
+```bash
+make build.infra ENV=dev
+```
 
 If you don't pass any value to env variable then by default script will take `dev` as value for environment.
 
@@ -154,6 +174,8 @@ If you don't pass any value to env variable then by default script will take `de
 In this section, we will build the application and containerize it. Since we will be pushing our application to cloud infrastructure, we will need a docker repository to access the docker images of applications.
 
 Currently, I am using a docker hub as solution which can be replaced with private repositories such as [AWS ECR](https://aws.amazon.com/ecr/). Docker Hub is only for demo purpose.
+
+> Note: To use docker hub on your machine, you might need to login with your account. Please follow [this](https://ropenscilabs.github.io/r-docker-tutorial/04-Dockerhub.html) tutorial to login via CLI.
 
 ### Variables
 
@@ -227,16 +249,22 @@ Now we have to validate our ansible stack configuration and we are good with dep
 
 - **Docker Image Validation**:
 
-  To validate that, go to `ansible/infra-problem/` and check `infra-compose.yml` to use the correct docker image for all the services. If you see them wrong, please correct it according to your need.
+  To validate that, go to `ansible/infra-problem/` and check `infra-compose.yml` to use the correct docker image for all the services. Please correct the username for the images being used by the services,
 
   ```yaml
   front-end:
-    image: "arunsingh1801/front-end:v2"
+    image: "</front-end:v2"
   ```
+
+  Replace `arunsingh1801` with your docker hub username
 
 - **Docker network subnet validate**:
 
-  Since we want to run our docker swarm in the same private subnet so we need to configure our `overlay` network to use the same subnet CIDR. You can see this configuration in `ansible/infra-problem/common-compose.yml`
+  Since we are running our docker swarm in the private subnet so we need to configure our `overlay` network to use the same subnet CIDR. You can see this configuration in `ansible/infra-problem/common-compose.yml`. You can get the value of subnet from `main.tf` of specific environment. e.g. from `env-config/dev/main.tf` we can see the value of private subnet,
+
+  ```ini
+  private_subnets = ["10.0.1.0/24"]
+  ```
 
   ```yaml
   networks:
@@ -299,3 +327,14 @@ vpc_id = "vpc-0bc6f1a702f231bf1"
 ```
 
 Copy the `elb_dns_name` and access the application. If your url is not working, please wait for few minutes since ELB will wait until at least one of the instance is healthy.
+
+## TODO
+
+- [ ] Add HTTPS support and communicate over secure protocol
+- [ ] Add support for auto generation of SSH key pair
+- [ ] Use private repository (ECR) support for docker images
+- [ ] Use Terraform remote state storage for delegation, locking and teamwork
+
+## Future work
+
+- [Future work [Concept]](Future-work.md)

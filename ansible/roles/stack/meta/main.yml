@@ -1,0 +1,4 @@
+---
+galaxy_info:
+  author: Arun Singh Sisodiya
+  description: This role gathers information about swarm and bootstrap the application using compose

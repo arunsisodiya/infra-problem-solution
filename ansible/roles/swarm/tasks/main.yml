@@ -18,28 +18,3 @@
     remote_addrs: [ "{{manager_hostname}}:2377" ]
   when: inventory_hostname in groups['workers']
 
-#- name: Enable Docker experimental
-#  copy:
-#    dest: "/etc/docker/daemon.json"
-#    content: |
-#      {
-#          "experimental": true,
-#          "metrics-addr": "172.18.0.1:9323"
-#      }
-#  register: experimental
-#
-#- name: Restart docker daemon
-#  systemd:
-#    name: docker
-#    state: restarted
-#    daemon_reload: yes
-#  when: experimental.changed
-#
-#- name: Ensure Docker daemon is running
-#  service:
-#    name: docker
-#    state: started
-#  register: docker_service
-#  until: docker_service.status.ActiveState == "active"
-#  retries: 15
-#  delay: 20

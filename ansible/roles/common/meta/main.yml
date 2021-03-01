@@ -1,0 +1,4 @@
+---
+galaxy_info:
+  author: Arun Singh Sisodiya
+  description: This role installs the basic dependencies and make machines ready with Docker
