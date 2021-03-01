@@ -22,7 +22,7 @@ services:
       - front-end
 
   front-end:
-    image: "arunsingh1801/front-end:v2"
+    image: "arunsingh1801/front-end:v1"
     deploy:
       replicas: 1
       restart_policy:
@@ -32,26 +32,16 @@ services:
     depends_on:
       - quotes
       - newsfeed
-      - static
     environment:
       APP_PORT: 8081
-      STATIC_URL: http://static:8000
+      STATIC_URL: https://infra-dev-s3.s3-eu-west-1.amazonaws.com
       QUOTE_SERVICE_URL: http://quotes:8082
       NEWSFEED_SERVICE_URL: http://newsfeed:8083
     secrets:
       - newsfeed_service_token
 
-  static:
-    image: "arunsingh1801/static:v2"
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-    networks:
-      - infra-network
-
   quotes:
-    image: "arunsingh1801/quotes:v2"
+    image: "arunsingh1801/quotes:v1"
     deploy:
       replicas: 1
       restart_policy:
@@ -64,7 +54,7 @@ services:
       - newsfeed_service_token
 
   newsfeed:
-    image: "arunsingh1801/newsfeed:v2"
+    image: "arunsingh1801/newsfeed:v1"
     deploy:
       replicas: 1
       restart_policy:

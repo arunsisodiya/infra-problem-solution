@@ -32,6 +32,25 @@ export AWS_SECRET_ACCESS_KEY=<ACCESS_SECRET>
 
 _Note - There are different other mechanisms to inject **AWS_ACCESS_KEY_ID** and **AWS_SECRET_ACCESS_KEY** but I am currently using the environment variables._
 
+## Architecture Overview
+
+In this section, we will look into the infrastructural point of view of the application.
+
+![Cloud_Architecture](Hybrid%20Cloud%20Architecture.png)
+
+Infrastructure of the application contains following components:
+
+- `VPC` - A virtual private cloud created to host our application
+- `Public Subnet` - This will only contain components which should be visible to outside world. This subnet contains `Elastic Load Balancer`, `Bastion host` & `Nat Gateway`
+- `Private Subnet` - This will contain our real application and NGINX for reverse proxy
+- `Network ACLs` - Network ACL have been applied on subnet level to prevent traffic from unknown sources
+- `Bastion Host` - This host is required to perform multiple operations in our architecture such as connecting to EC2 in private subnet, run ansible playbook via SSH Forwarding
+- `S3 bucket` - This will be hosting our static files such as css.
+- `Security Groups` - They will define the security rules for the resources inside them
+- `NAT Gateway` - This will give internet access to the EC2 machines present in private subnet. This is needed since few of our services want to fetch data from internet
+- `Internet Gateway` - This is attached to VPC to provide internet access to VPC
+- `Route Tables`- We are using route tables to define the routes for subnets
+
 ## Project Structure
 
 Before building the infrastructure and running the application in cloud, lets understand the structure of the project -
@@ -127,17 +146,17 @@ Currently, I am using a docker hub as solution which can be replaced with privat
 To build the docker image, run the following command -
 
 ```bash
-make docker.build IMAGE_TAG=<image_tag>
+make app.build IMAGE_TAG=<image_tag>
 
-e.g. make docker.build IMAGE_TAG=v1
+e.g. make app.build IMAGE_TAG=v1
 ```
 
 To push the application docker images to docker hub, run the following command -
 
 ```bash
-make docker.push DOCKER_HUB_USER=<repo_name> IMAGE_TAG=<image_tag>
+make app.push DOCKER_HUB_USER=<repo_name> IMAGE_TAG=<image_tag>
 
-e.g. make docker.push DOCKER_HUB_USER=arunsingh1801 IMAGE_TAG=v1
+e.g. make app.push DOCKER_HUB_USER=arunsingh1801 IMAGE_TAG=v1
 ```
 
 ## Configure Swarm cluster and deploy application

@@ -189,6 +189,7 @@ module "vpc" {
   environment      = var.environment
   cidr             = "10.0.0.0/16"
   instance_tenancy = "default"
+  bucket_name      =  var.bucket_name
 
   private_subnets = ["10.0.1.0/24"]
   public_subnets  = ["10.0.0.0/24"]

@@ -12,3 +12,8 @@ variable "key_pair" {
   description = "SSH Key pair to login to ec2 instances"
   default = ""
 }
+
+variable "bucket_name" {
+  description = "S3 bucket for static content"
+  default = ""
+}

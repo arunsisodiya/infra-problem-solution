@@ -312,3 +312,8 @@ variable "amis_os_map_owners" {
     windows-2008-r2-base = "801119661308" #amazon
   }
 }
+
+variable "bucket_name" {
+  description = "S3 bucket for static content"
+  default = ""
+}
