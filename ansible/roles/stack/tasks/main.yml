@@ -42,8 +42,6 @@
   run_once: true
 
 - name: Deploy docker stack
-  become: yes
-  become_user: ubuntu
   docker_stack:
     state: present
     prune: true
