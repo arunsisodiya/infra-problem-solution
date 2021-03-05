@@ -1,4 +1,4 @@
-# ThoughtWorks - Infra Problem Solution
+# Infra Problem Solution
 
 This document helps to build an infrastructure using Iac(Infrastructure as code) deploy a micro-services based application in Cloud infrastructure.
 
