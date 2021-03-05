@@ -2,7 +2,7 @@
 
 This document helps to build an infrastructure using Iac(Infrastructure as code) deploy a micro-services based application in Cloud infrastructure.
 
-- [ThoughtWorks - Infra Problem Solution](#thoughtworks---infra-problem-solution)
+- [Infra Problem Solution](#infra-problem-solution)
   - [Prerequisites](#prerequisites)
       - [Tools Compatibility Matrix](#tools-compatibility-matrix)
   - [Cloud provider configuration](#cloud-provider-configuration)
